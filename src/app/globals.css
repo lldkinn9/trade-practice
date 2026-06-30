@@ -1,26 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
 @import "tailwindcss";
 
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #040805; /* 極めて深いフォレストブラック */
+  --foreground: #f2f7f4; /* 淡いグリーンホワイト */
+  --card-bg: #08160c; /* 渋いモスグリーン */
+  --card-border: #122c19; /* 落ち着いたダークグリーンの枠線 */
+  --up-color: #ef4444; /* 日本の株：値上がりは赤 */
+  --down-color: #10b981; /* 日本の株：値下がりは緑 */
+  --stay-color: #6b7280;
+  --font-sans: 'Inter', 'Outfit', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
 }
+
+/* スクロールバーのカスタマイズ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--card-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #1c4728;
+}
+
+/* アニメーション用クラス */
+@keyframes flash-up {
+  0%, 100% { background-color: rgba(239, 68, 68, 0); }
+  50% { background-color: rgba(239, 68, 68, 0.25); }
+}
+@keyframes flash-down {
+  0%, 100% { background-color: rgba(16, 185, 129, 0); }
+  50% { background-color: rgba(16, 185, 129, 0.25); }
+}
+
+.flash-up-active {
+  animation: flash-up 0.5s ease-out;
+}
+.flash-down-active {
+  animation: flash-down 0.5s ease-out;
+}
+
+
