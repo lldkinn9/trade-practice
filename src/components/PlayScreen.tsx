@@ -22,7 +22,7 @@ export const PlayScreen: React.FC<PlayScreenProps> = ({ quiz, onAnswer, onBack }
   const maxSec = quiz.tick_stream_data.length - 1;
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const elapsedTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const logEndRef = useRef<HTMLDivElement | null>(null);
+  const logContainerRef = useRef<HTMLDivElement | null>(null);
 
   // 1秒刻みのアニメーション制御
   useEffect(() => {
@@ -74,10 +74,10 @@ export const PlayScreen: React.FC<PlayScreenProps> = ({ quiz, onAnswer, onBack }
     }
   }
 
-  // 歩み値ログが追加されたら一番下までスクロール
+  // 歩み値ログが追加されたらコンテナ内を一番下までスクロール
   useEffect(() => {
-    if (logEndRef.current) {
-      logEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (logContainerRef.current) {
+      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
     }
   }, [currentSec]);
 
@@ -132,7 +132,7 @@ export const PlayScreen: React.FC<PlayScreenProps> = ({ quiz, onAnswer, onBack }
           {/* 歩み値 (出来高・歩み値ログ) */}
           <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-lg p-3 flex flex-col h-48">
             <span className="text-xs font-semibold text-slate-400 mb-2">歩み値ログ</span>
-            <div className="flex-1 overflow-y-auto pr-1 flex flex-col gap-1 font-mono text-[11px]">
+            <div ref={logContainerRef} className="flex-1 overflow-y-auto pr-1 flex flex-col gap-1 font-mono text-[11px]">
               {accumulatedExecutions.length === 0 ? (
                 <div className="text-slate-600 text-center py-8">約定なし</div>
               ) : (
@@ -149,7 +149,6 @@ export const PlayScreen: React.FC<PlayScreenProps> = ({ quiz, onAnswer, onBack }
                   </div>
                 ))
               )}
-              <div ref={logEndRef} />
             </div>
           </div>
         </div>
