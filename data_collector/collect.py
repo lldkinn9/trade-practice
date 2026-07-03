@@ -34,10 +34,17 @@ def get_kabu_token():
     payload = {"APIPassword": KABU_API_PASSWORD}
     try:
         response = requests.post(url, json=payload, timeout=5)
-        response.raise_for_status()
+        if response.status_code != 200:
+            print(f"[ERROR] kabuステーションAPIトークン取得失敗 (ステータスコード: {response.status_code})")
+            try:
+                err_data = response.json()
+                print(f"[ERROR] エラー詳細: {err_data}")
+            except Exception:
+                print(f"[ERROR] レスポンスボディ: {response.text}")
+            return None
         return response.json().get("Token")
     except Exception as e:
-        print(f"[ERROR] kabuステーションAPIトークン取得失敗: {e}")
+        print(f"[ERROR] kabuステーションAPIトークン取得リクエスト失敗: {e}")
         return None
 
 def fetch_board_data(symbol, token):
@@ -147,8 +154,9 @@ def run_collection(symbol, mock_mode=False):
     if not mock_mode:
         token = get_kabu_token()
         if not token:
-            print("[ERROR] トークンが取得できないため、実データ収集を中止し、モックモードに移行します。")
-            mock_mode = True
+            print("[CRITICAL] kabuステーションAPIトークンが取得できません。kabuステーションがログイン状態で起動しているか確認してください。")
+            import sys
+            sys.exit(1)
 
     # 1. 開始前チャート（擬似的に30本生成）
     # 実データモードの場合は、kabuステーションから現在値を1回取得して base_price に設定
@@ -195,21 +203,23 @@ def run_collection(symbol, mock_mode=False):
                 # パース
                 step_data = {
                     "timestamp": sec,
-                    "current_price": board.get("CurrentPrice", start_price),
+                    "current_price": board.get("CurrentPrice") or board.get("CalcPrice") or start_price,
                     "bids": [{"price": b.get("Price"), "volume": b.get("Qty")} for b in board.get("Bids", [])[:5]],
                     "asks": [{"price": a.get("Price"), "volume": a.get("Qty")} for a in board.get("Asks", [])[:5]],
                     "executions": [
                         {
                             "time": datetime.now().strftime("%H:%M:%S"),
-                            "price": board.get("CurrentPrice", start_price),
+                            "price": board.get("CurrentPrice") or board.get("CalcPrice") or start_price,
                             "volume": board.get("CurrentPriceVolume", 100),
                             "type": "BUY" if board.get("CurrentPriceStatus") == 1 else "SELL"
                         }
                     ]
                 }
             else:
-                # API取得エラー時はフォールバック
-                step_data = generate_mock_board(symbol, start_price, sec)
+                # API取得エラー時はフォールバックせずエラー終了
+                print(f"[CRITICAL] 板情報の取得に失敗しました ({symbol})。kabuステーションの接続を確認してください。")
+                import sys
+                sys.exit(2)
         
         tick_stream.append(step_data)
         print(f" [{sec}s] 現在値: {step_data['current_price']}円")
@@ -241,9 +251,15 @@ def run_collection(symbol, mock_mode=False):
         time.sleep(50)
         board = fetch_board_data(symbol, token)
         if board:
-            result_price = board.get("CurrentPrice", end_price)
+            result_price = board.get("CurrentPrice") or board.get("CalcPrice")
+            if not result_price:
+                print(f"[CRITICAL] 結果取得時に現在値が取得できませんでした。")
+                import sys
+                sys.exit(3)
         else:
-            result_price = end_price
+            print(f"[CRITICAL] 結果の板情報取得に失敗しました。kabuステーションの接続を確認してください。")
+            import sys
+            sys.exit(3)
 
     price_change_ratio = round(((result_price - end_price) / end_price) * 100, 2)
     
