@@ -58,7 +58,8 @@ export default function Home() {
         const { data, error } = await supabase
           .from('quizzes')
           .select('*')
-          .limit(10);
+          .order('captured_at', { ascending: false })
+          .limit(100);
 
         if (error || !data || data.length === 0) {
           console.log('Supabase connection failed or quizzes table is empty. Falling back to mock data.');
