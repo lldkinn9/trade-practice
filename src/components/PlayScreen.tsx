@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Quiz, TickStreamDataPoint, Execution } from '../types/quiz';
 import { MiniChart } from './MiniChart';
 import { Board } from './Board';
-import { Play, Pause, RotateCcw, Eye, EyeOff, Clock, TrendingUp, TrendingDown } from 'lucide-react';
+import { Play, Pause, RotateCcw, Eye, EyeOff, Clock, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 interface PlayScreenProps {
   quiz: Quiz;
-  onAnswer: (answer: 'UP' | 'DOWN') => void;
+  onAnswer: (answer: 'UP' | 'DOWN' | 'STAY') => void;
   onBack: () => void;
 }
 
@@ -205,23 +205,32 @@ export const PlayScreen: React.FC<PlayScreenProps> = ({ quiz, onAnswer, onBack }
       </div>
 
       {/* 解答ボタンセクション */}
-      <div className="grid grid-cols-2 gap-4 mt-2">
+      <div className="grid grid-cols-3 gap-2 md:gap-4 mt-2">
         <button
           onClick={() => onAnswer('UP')}
-          className="flex flex-col items-center justify-center gap-2 py-4 bg-[#ef4444] hover:bg-[#ff5555] active:scale-95 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-red-500/20 hover:shadow-red-500/35 cursor-pointer"
+          className="flex flex-col items-center justify-center gap-1.5 py-3 md:py-4 bg-[#ef4444] hover:bg-[#ff5555] active:scale-95 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-red-500/20 hover:shadow-red-500/35 cursor-pointer"
         >
-          <TrendingUp className="w-6 h-6 stroke-[3px]" />
-          <span className="text-base tracking-wider">上昇する (UP)</span>
-          <span className="text-[10px] opacity-75 font-normal">判定期間後に +0.2%以上</span>
+          <TrendingUp className="w-5 h-5 md:w-6 md:h-6 stroke-[3px]" />
+          <span className="text-xs md:text-base tracking-wider">上昇 (UP)</span>
+          <span className="text-[9px] opacity-75 font-normal text-center px-1">変化率 +0.2%以上</span>
+        </button>
+
+        <button
+          onClick={() => onAnswer('STAY')}
+          className="flex flex-col items-center justify-center gap-1.5 py-3 md:py-4 bg-[#475569] hover:bg-[#57687e] active:scale-95 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-slate-500/20 hover:shadow-slate-500/35 cursor-pointer"
+        >
+          <Minus className="w-5 h-5 md:w-6 md:h-6 stroke-[3px]" />
+          <span className="text-xs md:text-base tracking-wider">横ばい (STAY)</span>
+          <span className="text-[9px] opacity-75 font-normal text-center px-1">変化率 -0.2%〜+0.2%</span>
         </button>
 
         <button
           onClick={() => onAnswer('DOWN')}
-          className="flex flex-col items-center justify-center gap-2 py-4 bg-[#10b981] hover:bg-[#05d993] active:scale-95 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/35 cursor-pointer"
+          className="flex flex-col items-center justify-center gap-1.5 py-3 md:py-4 bg-[#10b981] hover:bg-[#05d993] active:scale-95 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/35 cursor-pointer"
         >
-          <TrendingDown className="w-6 h-6 stroke-[3px]" />
-          <span className="text-base tracking-wider">下降する (DOWN)</span>
-          <span className="text-[10px] opacity-75 font-normal">判定期間後に -0.2%以下</span>
+          <TrendingDown className="w-5 h-5 md:w-6 md:h-6 stroke-[3px]" />
+          <span className="text-xs md:text-base tracking-wider">下降 (DOWN)</span>
+          <span className="text-[9px] opacity-75 font-normal text-center px-1">変化率 -0.2%以下</span>
         </button>
       </div>
 

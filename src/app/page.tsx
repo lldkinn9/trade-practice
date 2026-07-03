@@ -17,7 +17,7 @@ export default function Home() {
   const [currentPatternIndex, setCurrentPatternIndex] = useState<number>(0);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [currentQuizIndex, setCurrentQuizIndex] = useState<number>(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<'UP' | 'DOWN' | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<'UP' | 'DOWN' | 'STAY' | null>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isDemoMode, setIsDemoMode] = useState<boolean>(false);
@@ -130,7 +130,7 @@ export default function Home() {
     setCurrentPatternIndex(nextIndex);
   };
 
-  const handleAnswerSubmit = async (answer: 'UP' | 'DOWN') => {
+  const handleAnswerSubmit = async (answer: 'UP' | 'DOWN' | 'STAY') => {
     const quiz = quizzes[currentQuizIndex];
     if (!quiz) return;
 

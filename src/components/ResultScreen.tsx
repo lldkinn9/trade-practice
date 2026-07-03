@@ -5,7 +5,7 @@ import { CheckCircle2, XCircle, ArrowRight, RefreshCw, BarChart } from 'lucide-r
 
 interface ResultScreenProps {
   quiz: Quiz;
-  selectedAnswer: 'UP' | 'DOWN';
+  selectedAnswer: 'UP' | 'DOWN' | 'STAY';
   isCorrect: boolean;
   onNext: () => void;
   onRetry: () => void;
@@ -59,7 +59,7 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
               {isCorrect ? '正解！' : '不正解...'}
             </h2>
             <p className="text-xs opacity-80 mt-1">
-              あなたの予測: <strong className="font-bold">{selectedAnswer === 'UP' ? '上昇する (UP)' : '下降する (DOWN)'}</strong>
+              あなたの予測: <strong className="font-bold">{selectedAnswer === 'UP' ? '上昇する (UP)' : selectedAnswer === 'DOWN' ? '下降する (DOWN)' : '横ばい (STAY)'}</strong>
               {' / '}
               正解: <strong className="font-bold">{quiz.answer_direction === 'UP' ? '上昇する (UP)' : quiz.answer_direction === 'DOWN' ? '下降する (DOWN)' : '横ばい (STAY)'}</strong>
             </p>
