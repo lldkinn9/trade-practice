@@ -28,6 +28,16 @@ TARGET_SYMBOLS = {
     "7203": "トヨタ自動車"
 }
 
+def calculate_ma(candles, period):
+    ma = []
+    for i in range(len(candles)):
+        if i < period - 1:
+            ma.append(None)
+        else:
+            total = sum(c["close"] for c in candles[i - period + 1 : i + 1])
+            ma.append(total / period)
+    return ma
+
 def get_kabu_token():
     """kabuステーションAPIからトークンを取得"""
     url = f"http://localhost:{KABU_API_PORT}/kabusapi/token"
@@ -284,8 +294,45 @@ def run_collection(symbol, mock_mode=False):
     }]
 
     # 4. 要約情報の作成 (Gemini API用プロンプト埋め込み用)
-    initial_trend = "上昇傾向（ゴールデンクロス直後）" if initial_candles[-1]["close"] > initial_candles[0]["close"] else "下降トレンド（戻り売り圧力強）"
-    initial_chart_summary = f"{initial_trend}。直近30分終値: {initial_candles[0]['close']}円 -> {initial_candles[-1]['close']}円"
+    ma5 = calculate_ma(initial_candles, 5)
+    ma25 = calculate_ma(initial_candles, 25)
+
+    is_golden_cross = False
+    is_dead_cross = False
+
+    # 直近の2本でクロスを判定 (28本目と29本目)
+    if len(ma5) >= 30 and ma5[-2] is not None and ma25[-2] is not None and ma5[-1] is not None and ma25[-1] is not None:
+        if ma5[-2] <= ma25[-2] and ma5[-1] > ma25[-1]:
+            is_golden_cross = True
+        elif ma5[-2] >= ma25[-2] and ma5[-1] < ma25[-1]:
+            is_dead_cross = True
+
+    current_price = initial_candles[-1]["close"]
+    start_price = initial_candles[0]["close"]
+    overall_up = current_price > start_price
+
+    if is_golden_cross:
+        initial_trend = "短期移動平均線(MA5)が中期移動平均線(MA25)を上抜けるゴールデンクロスが発生。"
+    elif is_dead_cross:
+        initial_trend = "短期移動平均線(MA5)が中期移動平均線(MA25)を下抜けるデッドクロスが発生。"
+    else:
+        ma5_val = ma5[-1]
+        ma25_val = ma25[-1]
+        if ma5_val is not None and ma25_val is not None:
+            if ma5_val > ma25_val:
+                if overall_up:
+                    initial_trend = "短期移動平均線(MA5)が中期移動平均線(MA25)の上で推移する上昇傾向。"
+                else:
+                    initial_trend = "短期移動平均線(MA5)は中期移動平均線(MA25)の上にあるが、足元はもみ合い・調整局面。"
+            else:
+                if not overall_up:
+                    initial_trend = "短期移動平均線(MA5)が中期移動平均線(MA25)の下で推移する下降傾向。"
+                else:
+                    initial_trend = "短期移動平均線(MA5)は中期移動平均線(MA25)の下にあるが、足元は反発局面。"
+        else:
+            initial_trend = "上昇傾向" if overall_up else "下降傾向"
+
+    initial_chart_summary = f"{initial_trend}。直近30分終値: {start_price}円 -> {current_price}円"
     
     tick_stream_summary = f"開始時板比率: 売り厚め。10秒間で現在値が {tick_stream[0]['current_price']}円から{tick_stream[-1]['current_price']}円へ変化。"
     

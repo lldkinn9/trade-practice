@@ -50,3 +50,5 @@ ENV/
 env/
 quiz_data_draft.json
 
+
+.vercel

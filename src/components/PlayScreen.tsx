@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Quiz, TickStreamDataPoint, Execution } from '../types/quiz';
-import { MiniChart } from './MiniChart';
+import { TechnicalChart } from './TechnicalChart';
 import { Board } from './Board';
 import { Play, Pause, RotateCcw, Eye, EyeOff, Clock, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
@@ -96,29 +96,29 @@ export const PlayScreen: React.FC<PlayScreenProps> = ({ quiz, onAnswer, onBack }
   return (
     <div className="flex flex-col gap-4 py-2 animate-fade-in text-white max-w-4xl mx-auto">
       {/* 上部ヘッダー */}
-      <div className="flex justify-between items-center bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl px-4 py-3">
+      <div className="flex justify-between items-center bg-[#0b0716] border border-[#2d1b4e] rounded-xl px-4 py-3 shadow-[0_0_15px_rgba(189,0,255,0.1)]">
         <div className="flex items-center gap-3">
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-slate-400 font-medium">銘柄</span>
               <button 
                 onClick={() => setHideSymbol(!hideSymbol)}
-                className="text-slate-500 hover:text-slate-300 transition-colors"
+                className="text-slate-500 hover:text-[#00f0ff] transition-colors"
                 title={hideSymbol ? "銘柄名を表示" : "銘柄名を隠す"}
               >
                 {hideSymbol ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
               </button>
             </div>
-            <div className="text-sm font-bold tracking-wider font-mono">
-              {hideSymbol ? '銘柄 A' : `${quiz.name} (${quiz.symbol})`}
+            <div className="text-sm font-black tracking-widest font-mono text-[#00f0ff] neon-text-cyan">
+              {hideSymbol ? 'MOCK_ASSET_A' : `${quiz.name} (${quiz.symbol})`}
             </div>
           </div>
           {/* 回答へのバイアスを避けるため、銘柄名やパターンは回答後に開示します */}
         </div>
 
-        <div className="flex items-center gap-2 bg-[var(--background)] px-3 py-1.5 rounded-lg border border-[var(--card-border)] font-mono text-xs text-slate-300">
-          <Clock className="w-3.5 h-3.5 text-emerald-500" />
-          <span>経過時間:</span>
+        <div className="flex items-center gap-2 bg-[#05020c] px-3 py-1.5 rounded-lg border border-[#bd00ff]/30 font-mono text-xs text-slate-300 shadow-[0_0_8px_rgba(189,0,255,0.15)]">
+          <Clock className="w-3.5 h-3.5 text-[#00f0ff]" />
+          <span>ELAPSED:</span>
           <span className="font-bold text-white">{formatElapsed(elapsedTime)}</span>
         </div>
       </div>
@@ -127,10 +127,10 @@ export const PlayScreen: React.FC<PlayScreenProps> = ({ quiz, onAnswer, onBack }
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
         {/* 左側: ミニチャート */}
         <div className="md:col-span-7 flex flex-col gap-4">
-          <MiniChart initialData={quiz.initial_chart_data} showResult={false} />
+          <TechnicalChart initialData={quiz.initial_chart_data} showResult={false} />
           
           {/* 歩み値 (出来高・歩み値ログ) */}
-          <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-lg p-3 flex flex-col h-48">
+          <div className="bg-[#0b0716] border border-[#1f1235] rounded-lg p-3 flex flex-col h-48 shadow-[0_0_10px_rgba(0,240,255,0.02)]">
             <span className="text-xs font-semibold text-slate-400 mb-2">歩み値ログ</span>
             <div ref={logContainerRef} className="flex-1 overflow-y-auto pr-1 flex flex-col gap-1 font-mono text-[11px]">
               {accumulatedExecutions.length === 0 ? (
@@ -164,17 +164,17 @@ export const PlayScreen: React.FC<PlayScreenProps> = ({ quiz, onAnswer, onBack }
       </div>
 
       {/* アニメーションコントローラー */}
-      <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-4 flex flex-col gap-3">
-        <div className="flex justify-between items-center text-xs text-slate-400">
-          <span>板読みストリーム (10秒間)</span>
-          <span className="font-mono text-white font-semibold">{currentSec}秒 / {maxSec}秒</span>
+      <div className="bg-[#0b0716] border border-[#2d1b4e] rounded-xl p-4 flex flex-col gap-3 shadow-[0_0_15px_rgba(189,0,255,0.05)]">
+        <div className="flex justify-between items-center text-xs text-slate-400 font-mono">
+          <span>ORDERBOOK STREAM (10s)</span>
+          <span className="text-[#00f0ff] font-semibold">{currentSec}s / {maxSec}s</span>
         </div>
         
         <div className="flex items-center gap-3">
           {/* 再生/一時停止 */}
           <button
             onClick={handlePlayPause}
-            className="p-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors flex items-center justify-center cursor-pointer"
+            className="p-2 bg-[#bd00ff] hover:bg-[#d946ef] text-white rounded-lg transition-all flex items-center justify-center shadow-[0_0_10px_rgba(189,0,255,0.4)] cursor-pointer"
             title={isPlaying ? "一時停止" : "再生"}
           >
             {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 fill-current" />}
@@ -183,7 +183,7 @@ export const PlayScreen: React.FC<PlayScreenProps> = ({ quiz, onAnswer, onBack }
           {/* リセット */}
           <button
             onClick={handleReset}
-            className="p-2 bg-[var(--card-border)] hover:bg-[#1a3f25] text-slate-300 rounded-lg transition-colors flex items-center justify-center cursor-pointer"
+            className="p-2 bg-[#1f1235] hover:bg-[#2d1b4e] text-slate-300 border border-[#bd00ff]/30 hover:border-[#bd00ff]/80 rounded-lg transition-all flex items-center justify-center cursor-pointer"
             title="最初から再生"
           >
             <RotateCcw className="w-4 h-4" />
@@ -199,7 +199,7 @@ export const PlayScreen: React.FC<PlayScreenProps> = ({ quiz, onAnswer, onBack }
               setIsPlaying(false);
               setCurrentSec(Number(e.target.value));
             }}
-            className="flex-1 h-1.5 bg-[var(--background)] rounded-lg appearance-none cursor-pointer accent-emerald-500"
+            className="flex-1 h-1.5 bg-[#05020c] rounded-lg appearance-none cursor-pointer accent-[#bd00ff]"
           />
         </div>
       </div>
@@ -208,36 +208,36 @@ export const PlayScreen: React.FC<PlayScreenProps> = ({ quiz, onAnswer, onBack }
       <div className="grid grid-cols-3 gap-2 md:gap-4 mt-2">
         <button
           onClick={() => onAnswer('UP')}
-          className="flex flex-col items-center justify-center gap-1.5 py-3 md:py-4 bg-[#ef4444] hover:bg-[#ff5555] active:scale-95 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-red-500/20 hover:shadow-red-500/35 cursor-pointer"
+          className="flex flex-col items-center justify-center gap-1.5 py-3 md:py-4 bg-[#f43f5e] hover:bg-[#ff5572] active:scale-95 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-rose-500/20 hover:shadow-rose-500/40 border border-rose-500/30 hover:border-[#00f0ff] cursor-pointer"
         >
           <TrendingUp className="w-5 h-5 md:w-6 md:h-6 stroke-[3px]" />
-          <span className="text-xs md:text-base tracking-wider">上昇 (UP)</span>
-          <span className="text-[9px] opacity-75 font-normal text-center px-1">変化率 +0.2%以上</span>
+          <span className="text-xs md:text-base tracking-wider font-sans font-extrabold">上昇 (UP)</span>
+          <span className="text-[9px] opacity-75 font-normal text-center px-1 font-mono">変化率 +0.2%以上</span>
         </button>
 
         <button
           onClick={() => onAnswer('STAY')}
-          className="flex flex-col items-center justify-center gap-1.5 py-3 md:py-4 bg-[#475569] hover:bg-[#57687e] active:scale-95 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-slate-500/20 hover:shadow-slate-500/35 cursor-pointer"
+          className="flex flex-col items-center justify-center gap-1.5 py-3 md:py-4 bg-[#1a0f30] hover:bg-[#2d1553] active:scale-95 text-slate-100 font-bold rounded-xl transition-all duration-200 border border-[#bd00ff]/50 hover:border-[#bd00ff] hover:shadow-[0_0_15px_rgba(189,0,255,0.3)] cursor-pointer"
         >
-          <Minus className="w-5 h-5 md:w-6 md:h-6 stroke-[3px]" />
-          <span className="text-xs md:text-base tracking-wider">横ばい (STAY)</span>
-          <span className="text-[9px] opacity-75 font-normal text-center px-1">変化率 -0.2%〜+0.2%</span>
+          <Minus className="w-5 h-5 md:w-6 md:h-6 stroke-[3px] text-[#00f0ff]" />
+          <span className="text-xs md:text-base tracking-wider font-sans font-extrabold">横ばい (STAY)</span>
+          <span className="text-[9px] opacity-75 font-normal text-center px-1 font-mono">変化率 -0.2%〜+0.2%</span>
         </button>
 
         <button
           onClick={() => onAnswer('DOWN')}
-          className="flex flex-col items-center justify-center gap-1.5 py-3 md:py-4 bg-[#10b981] hover:bg-[#05d993] active:scale-95 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/35 cursor-pointer"
+          className="flex flex-col items-center justify-center gap-1.5 py-3 md:py-4 bg-[#10b981] hover:bg-[#05d993] active:scale-95 text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 border border-emerald-500/30 hover:border-[#00f0ff] cursor-pointer"
         >
           <TrendingDown className="w-5 h-5 md:w-6 md:h-6 stroke-[3px]" />
-          <span className="text-xs md:text-base tracking-wider">下降 (DOWN)</span>
-          <span className="text-[9px] opacity-75 font-normal text-center px-1">変化率 -0.2%以下</span>
+          <span className="text-xs md:text-base tracking-wider font-sans font-extrabold">下降 (DOWN)</span>
+          <span className="text-[9px] opacity-75 font-normal text-center px-1 font-mono">変化率 -0.2%以下</span>
         </button>
       </div>
 
       {/* 戻るボタン */}
       <button 
         onClick={onBack}
-        className="text-center text-xs text-slate-500 hover:text-slate-300 transition-colors mt-2 underline"
+        className="text-center text-xs text-slate-500 hover:text-[#00f0ff] transition-colors mt-2 underline"
       >
         トレーニングメニューに戻る
       </button>
